@@ -16,9 +16,13 @@ import java.io.IOException;
 @Service
 public class ImageService {
     private final ImageValidator imageValidator;
+    private final ImageProcessor grayscaleProcessor;
+    private final ImageProcessor invertProcessor;
 
-    public ImageService(ImageValidator imageValidator) {
+    public ImageService(ImageValidator imageValidator, ImageProcessor grayscaleProcessor, ImageProcessor invertProcessor) {
         this.imageValidator = imageValidator;
+        this.grayscaleProcessor = grayscaleProcessor;
+        this.invertProcessor = invertProcessor;
     }
 
     public byte[] processGrayscale(MultipartFile file) throws IOException {
@@ -27,29 +31,11 @@ public class ImageService {
         // multipartfile을 buffredimage로 변환
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
-        // 흑백 처리 로직 실행(기존 코드 사용)
-        BufferedImage grayscaleImage = convertToGrayscale(originalImage);
+        // 흑백 처리 로직 실행(Processor에 위임)
+        BufferedImage grayscaleImage = grayscaleProcessor.process(originalImage);
 
         // buffredimage를 byte array로 변환해 반환
         return convertToByteArray(grayscaleImage, getFileExtension(file.getOriginalFilename()));
-    }
-
-    public BufferedImage convertToGrayscale(BufferedImage image) {
-        BufferedImage grayscaleImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-
-        for(int y = 0 ; y < image.getHeight() ; y++){
-            for(int x = 0 ; x < image.getWidth() ; x++){
-                Color color = new Color(image.getRGB(x, y));
-
-                Pixel originalPixel = new Pixel(color.getRed(), color.getGreen(), color.getBlue());
-
-                Pixel grayscalePixel = originalPixel.toGrayScale();
-
-                grayscaleImage.setRGB(x, y, grayscalePixel.toAwtColor().getRGB());
-            }
-        }
-
-        return grayscaleImage;
     }
 
     public byte[] processInvert(MultipartFile file) throws IOException {
@@ -57,27 +43,9 @@ public class ImageService {
 
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
-        BufferedImage invertedImage = convertToInvert(originalImage);
+        BufferedImage invertedImage = invertProcessor.process(originalImage);
 
         return convertToByteArray(invertedImage, getFileExtension(file.getOriginalFilename()));
-    }
-
-    private BufferedImage convertToInvert(BufferedImage image) {
-        BufferedImage invertedImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
-
-        for(int y = 0 ; y < image.getHeight() ; y++){
-            for(int x = 0 ; x < image.getWidth() ; x++){
-                Color color = new Color(image.getRGB(x, y));
-
-                Pixel originalPixel = new Pixel(color.getRed(), color.getGreen(), color.getBlue());
-
-                Pixel invertedPixel = originalPixel.toInvert();
-
-                invertedImage.setRGB(x, y, invertedPixel.toAwtColor().getRGB());
-            }
-        }
-
-        return invertedImage;
     }
 
     // 💡 Byte Array 변환 헬퍼
