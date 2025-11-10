@@ -1,6 +1,7 @@
 package com.example.imageprocessing.service;
 
 
+import com.example.imageprocessing.domain.Pixel;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,9 +14,7 @@ import java.io.IOException;
 
 @Service
 public class ImageService {
-    private static final double RED_SENSITIVITY = 0.2126;
-    private static final double GREEN_SENSITIVITY = 0.7152;
-    private static final double BLUE_SENSITIVITY = 0.0722;
+
 
     public byte[] processGrayscale(MultipartFile file) throws IOException {
         // multipartfile을 buffredimage로 변환
@@ -38,19 +37,15 @@ public class ImageService {
             for(int x = 0 ; x < image.getWidth() ; x++){
                 Color color = new Color(image.getRGB(x, y));
 
-                int Y = weightedAvgCalculation(color.getRed(), color.getGreen(), color.getBlue());
+                Pixel originalPixel = new Pixel(color.getRed(), color.getGreen(), color.getBlue());
 
-                grayscaleImage.setRGB(x, y, new Color(Y, Y, Y).getRGB());
+                Pixel grayscalePixel = originalPixel.toGrayScale();
+
+                grayscaleImage.setRGB(x, y, grayscalePixel.toAwtColor().getRGB());
             }
         }
 
         return grayscaleImage;
-    }
-
-    private int weightedAvgCalculation(int r, int g, int b){
-        double rawY = RED_SENSITIVITY * r + GREEN_SENSITIVITY * g + BLUE_SENSITIVITY * b;
-
-        return (int) Math.round(rawY);
     }
 
     // 💡 Byte Array 변환 헬퍼
