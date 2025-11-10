@@ -52,6 +52,34 @@ public class ImageService {
         return grayscaleImage;
     }
 
+    public byte[] processInvert(MultipartFile file) throws IOException {
+        imageValidator.validate(file);
+
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
+
+        BufferedImage invertedImage = convertToInvert(originalImage);
+
+        return convertToByteArray(invertedImage, getFileExtension(file.getOriginalFilename()));
+    }
+
+    private BufferedImage convertToInvert(BufferedImage image) {
+        BufferedImage invertedImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+
+        for(int y = 0 ; y < image.getHeight() ; y++){
+            for(int x = 0 ; x < image.getWidth() ; x++){
+                Color color = new Color(image.getRGB(x, y));
+
+                Pixel originalPixel = new Pixel(color.getRed(), color.getGreen(), color.getBlue());
+
+                Pixel invertedPixel = originalPixel.toInvert();
+
+                invertedImage.setRGB(x, y, invertedPixel.toAwtColor().getRGB());
+            }
+        }
+
+        return invertedImage;
+    }
+
     // 💡 Byte Array 변환 헬퍼
     private byte[] convertToByteArray(BufferedImage image, String formatName) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
