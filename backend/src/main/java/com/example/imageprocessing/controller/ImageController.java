@@ -36,4 +36,19 @@ public class ImageController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @PostMapping("/invert")
+    public ResponseEntity<byte[]> processInvert(@RequestParam("file") MultipartFile file){
+        try{
+            byte[] processedImageBytes = imageService.processInvert(file);
+
+            return ResponseEntity.ok()
+                    .contentType(ImageService.getMediaType(file.getContentType()))
+                    .body(processedImageBytes);
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e){
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }
