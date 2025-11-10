@@ -1,6 +1,8 @@
 package com.example.imageprocessing.service;
 
 
+import com.example.imageprocessing.domain.ImageValidator;
+import com.example.imageprocessing.domain.Pixel;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -13,16 +15,17 @@ import java.io.IOException;
 
 @Service
 public class ImageService {
-    private static final double RED_SENSITIVITY = 0.2126;
-    private static final double GREEN_SENSITIVITY = 0.7152;
-    private static final double BLUE_SENSITIVITY = 0.0722;
+    private final ImageValidator imageValidator;
+
+    public ImageService(ImageValidator imageValidator) {
+        this.imageValidator = imageValidator;
+    }
 
     public byte[] processGrayscale(MultipartFile file) throws IOException {
+        imageValidator.validate(file);
+
         // multipartfile을 buffredimage로 변환
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
-        if(originalImage == null){
-            throw new IllegalArgumentException("[ERROR] 유효한 이미지 파일이 아닙니다.");
-        }
 
         // 흑백 처리 로직 실행(기존 코드 사용)
         BufferedImage grayscaleImage = convertToGrayscale(originalImage);
@@ -38,19 +41,15 @@ public class ImageService {
             for(int x = 0 ; x < image.getWidth() ; x++){
                 Color color = new Color(image.getRGB(x, y));
 
-                int Y = weightedAvgCalculation(color.getRed(), color.getGreen(), color.getBlue());
+                Pixel originalPixel = new Pixel(color.getRed(), color.getGreen(), color.getBlue());
 
-                grayscaleImage.setRGB(x, y, new Color(Y, Y, Y).getRGB());
+                Pixel grayscalePixel = originalPixel.toGrayScale();
+
+                grayscaleImage.setRGB(x, y, grayscalePixel.toAwtColor().getRGB());
             }
         }
 
         return grayscaleImage;
-    }
-
-    private int weightedAvgCalculation(int r, int g, int b){
-        double rawY = RED_SENSITIVITY * r + GREEN_SENSITIVITY * g + BLUE_SENSITIVITY * b;
-
-        return (int) Math.round(rawY);
     }
 
     // 💡 Byte Array 변환 헬퍼
