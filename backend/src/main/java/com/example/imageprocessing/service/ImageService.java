@@ -1,6 +1,7 @@
 package com.example.imageprocessing.service;
 
 
+import com.example.imageprocessing.domain.ImageValidator;
 import com.example.imageprocessing.domain.Pixel;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -14,14 +15,17 @@ import java.io.IOException;
 
 @Service
 public class ImageService {
+    private final ImageValidator imageValidator;
 
+    public ImageService(ImageValidator imageValidator) {
+        this.imageValidator = imageValidator;
+    }
 
     public byte[] processGrayscale(MultipartFile file) throws IOException {
+        imageValidator.validate(file);
+
         // multipartfile을 buffredimage로 변환
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
-        if(originalImage == null){
-            throw new IllegalArgumentException("[ERROR] 유효한 이미지 파일이 아닙니다.");
-        }
 
         // 흑백 처리 로직 실행(기존 코드 사용)
         BufferedImage grayscaleImage = convertToGrayscale(originalImage);
