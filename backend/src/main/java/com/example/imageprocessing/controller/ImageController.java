@@ -51,4 +51,20 @@ public class ImageController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @PostMapping("/brightness")
+    public ResponseEntity<byte[]> processBrightness(@RequestParam("file") MultipartFile file,
+                                                    @RequestParam("adjustment") int adjustment){
+        try{
+            byte[] processedImageBytes = imageService.processBrightness(file, adjustment);
+
+            return ResponseEntity.ok()
+                    .contentType(ImageService.getMediaType(file.getContentType()))
+                    .body(processedImageBytes);
+        } catch (IllegalArgumentException e){
+            return ResponseEntity.badRequest().build();
+        } catch (Exception e){
+            return ResponseEntity.internalServerError().build();
+        }
+    }
 }
