@@ -2,7 +2,7 @@ package com.example.imageprocessing.service;
 
 
 import com.example.imageprocessing.domain.ImageValidator;
-import com.example.imageprocessing.domain.Pixel;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,11 +18,16 @@ public class ImageService {
     private final ImageValidator imageValidator;
     private final ImageProcessor grayscaleProcessor;
     private final ImageProcessor invertProcessor;
+    private final BrightnessProcessor brightnessProcessor;
 
-    public ImageService(ImageValidator imageValidator, ImageProcessor grayscaleProcessor, ImageProcessor invertProcessor) {
+    public ImageService(ImageValidator imageValidator,
+                        ImageProcessor grayscaleProcessor,
+                        ImageProcessor invertProcessor,
+                        BrightnessProcessor brightnessProcessor) {
         this.imageValidator = imageValidator;
         this.grayscaleProcessor = grayscaleProcessor;
         this.invertProcessor = invertProcessor;
+        this.brightnessProcessor = brightnessProcessor;
     }
 
     public byte[] processGrayscale(MultipartFile file) throws IOException {
@@ -46,6 +51,16 @@ public class ImageService {
         BufferedImage invertedImage = invertProcessor.process(originalImage);
 
         return convertToByteArray(invertedImage, getFileExtension(file.getOriginalFilename()));
+    }
+
+    public byte[] processBrightness(MultipartFile file, int adjustment) throws IOException {
+        imageValidator.validate(file);
+
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
+
+        BufferedImage brightnessImage = brightnessProcessor.process(originalImage, adjustment);
+
+        return  convertToByteArray(brightnessImage, getFileExtension(file.getOriginalFilename()));
     }
 
     // 💡 Byte Array 변환 헬퍼
