@@ -3,6 +3,14 @@ import EditorPanel from './EditorPanel'
 import ImageCanvas from './ImageCanvas'
 import { useState } from 'react'
 
+const FILTER_URLS: { [key: string]: string } = {
+    "GrayScale": "http://localhost:8080/api/image/grayscale",
+    "Inversion": "http://localhost:8080/api/image/invert",
+    // "Brightness": "http://localhost:8080/api/image/brightness",
+    // "Crop": "http://localhost:8080/api/image/crop",
+    // "Reset": "http://localhost:8080/api/image/reset",
+};
+
 export default function ImageEditor() {
     // 문자열 or null 둘 다 가능하게 타입 명시
     const [image, setImage] = useState<string | null>(null);
@@ -23,33 +31,43 @@ export default function ImageEditor() {
             alert("이미지를 먼저 선택하세요");
             return;
         }
-        if (type === "GrayScale") {
-            const formData = new FormData();
-            formData.append("file", file);
 
-            try {
-                const response = await fetch("http://localhost:8080/api/image/grayscale", {
-                    method: "POST",
-                    body: formData,
-                    mode: "cors"
-                });
+        // 매핑 객체에서 URL 조회
+        const url = FILTER_URLS[type];
 
-                if (!response.ok) {
-                    throw new Error("[ERROR] 서버 오류");
-                }
-
-                const blob = await response.blob(); // 이미지 blob으로 받기
-                const imageUrl = URL.createObjectURL(blob);
-                setImage(imageUrl);
-            } catch (error) {
-                console.error("[ERROR] 흑백 변환 실패:", error);
-                alert("[ERROR] 이미지 처리 중 오류 발생");
-            }
+        if(!url){
+            console.warn(`[WARN] 지원하지 않는 형식입니다: ${type}`);
+            return;
         }
-        // if (type === "Brightness") {}
-        // if (type === "Inversion") {}
-        // if (type === "Crop") {}
-        // if (type === "Reset") {}
+
+        const formData = new FormData();
+        formData.append("file", file);
+
+        try {
+            const response = await fetch(url, {
+                method: "POST",
+                body: formData,
+                mode: "cors"
+            });
+
+            if(!response.ok){
+                throw new Error("[ERROR] 서버 오류");
+            }
+
+            const blob = await response.blob(); // 이미지 blob으로 받기
+
+            if(image) {
+                URL.revokeObjectURL(image);
+            }
+            const imageURL = URL.createObjectURL(blob);
+
+            const processedFile = new File([blob], file.name, {type: blob.type});
+            setFile(processedFile);
+            setImage(imageURL);
+        } catch (error) {
+            console.error(`[ERROR] ${type} 변환 실패:`, error);
+            alert("[ERROR] 이미지 처리 중 오류 발생");
+        }
     };
 
     // 이미지 파일 저장할 때 실행

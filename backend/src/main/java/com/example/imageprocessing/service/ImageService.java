@@ -2,7 +2,7 @@ package com.example.imageprocessing.service;
 
 
 import com.example.imageprocessing.domain.ImageValidator;
-import com.example.imageprocessing.domain.Pixel;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -16,9 +16,18 @@ import java.io.IOException;
 @Service
 public class ImageService {
     private final ImageValidator imageValidator;
+    private final ImageProcessor grayscaleProcessor;
+    private final ImageProcessor invertProcessor;
+    private final BrightnessProcessor brightnessProcessor;
 
-    public ImageService(ImageValidator imageValidator) {
+    public ImageService(ImageValidator imageValidator,
+                        ImageProcessor grayscaleProcessor,
+                        ImageProcessor invertProcessor,
+                        BrightnessProcessor brightnessProcessor) {
         this.imageValidator = imageValidator;
+        this.grayscaleProcessor = grayscaleProcessor;
+        this.invertProcessor = invertProcessor;
+        this.brightnessProcessor = brightnessProcessor;
     }
 
     public byte[] processGrayscale(MultipartFile file) throws IOException {
@@ -27,29 +36,31 @@ public class ImageService {
         // multipartfile을 buffredimage로 변환
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
-        // 흑백 처리 로직 실행(기존 코드 사용)
-        BufferedImage grayscaleImage = convertToGrayscale(originalImage);
+        // 흑백 처리 로직 실행(Processor에 위임)
+        BufferedImage grayscaleImage = grayscaleProcessor.process(originalImage);
 
         // buffredimage를 byte array로 변환해 반환
         return convertToByteArray(grayscaleImage, getFileExtension(file.getOriginalFilename()));
     }
 
-    public BufferedImage convertToGrayscale(BufferedImage image) {
-        BufferedImage grayscaleImage = new BufferedImage(image.getWidth(), image.getHeight(), image.getType());
+    public byte[] processInvert(MultipartFile file) throws IOException {
+        imageValidator.validate(file);
 
-        for(int y = 0 ; y < image.getHeight() ; y++){
-            for(int x = 0 ; x < image.getWidth() ; x++){
-                Color color = new Color(image.getRGB(x, y));
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
-                Pixel originalPixel = new Pixel(color.getRed(), color.getGreen(), color.getBlue());
+        BufferedImage invertedImage = invertProcessor.process(originalImage);
 
-                Pixel grayscalePixel = originalPixel.toGrayScale();
+        return convertToByteArray(invertedImage, getFileExtension(file.getOriginalFilename()));
+    }
 
-                grayscaleImage.setRGB(x, y, grayscalePixel.toAwtColor().getRGB());
-            }
-        }
+    public byte[] processBrightness(MultipartFile file, int adjustment) throws IOException {
+        imageValidator.validate(file);
 
-        return grayscaleImage;
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
+
+        BufferedImage brightnessImage = brightnessProcessor.process(originalImage, adjustment);
+
+        return  convertToByteArray(brightnessImage, getFileExtension(file.getOriginalFilename()));
     }
 
     // 💡 Byte Array 변환 헬퍼
