@@ -8,6 +8,7 @@ public class Pixel {
     private final int blue;
 
     private final int max = 255;
+    private final int min = 0;
 
     // AWT Color 객체를 받아서 domain 객체로 변환하는 팩토리 메소드
     public Pixel(int red, int green, int blue) {
@@ -34,5 +35,17 @@ public class Pixel {
         int invertedB = max - blue;
 
         return new Pixel(invertedR, invertedG, invertedB);
+    }
+
+    public Pixel adjustBrightness(int adjustment) {
+        int newR = clamp(red + adjustment);
+        int newG = clamp(green + adjustment);
+        int newB = clamp(blue + adjustment);
+
+        return new Pixel(newR, newG, newB);
+    }
+
+    private int clamp(int value) {
+        return Math.max(min, Math.min(max, value));
     }
 }
