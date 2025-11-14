@@ -7,8 +7,7 @@ const FILTER_URLS: { [key: string]: string } = {
     "GrayScale": "http://localhost:8080/api/image/grayscale",
     "Inversion": "http://localhost:8080/api/image/invert",
     // "Brightness": "http://localhost:8080/api/image/brightness",
-    "Crop": "http://localhost:8080/api/image/crop",
-    // "Reset": "http://localhost:8080/api/image/reset",
+    "Crop": "http://localhost:8080/api/image/crop"
 };
 
 export default function ImageEditor() {
@@ -16,22 +15,42 @@ export default function ImageEditor() {
     const [image, setImage] = useState<string | null>(null);
     const [file, setFile] = useState<File | null>(null);
 
+    const [originalFile, setOriginalFile] = useState<File | null>(null);
+
     // Crop 모드 여부
     const [isCropMode, setIsCropMode] = useState(false);
 
     // 파일 선택했을 때 실행
     const handleOpenPhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
         const selectedFile = e.target.files?.[0];
-        if (selectedFile) {
-            setFile(selectedFile);
-            setImage(URL.createObjectURL(selectedFile));
-        }
+        if (!selectedFile) return;
+
+        const url = URL.createObjectURL(selectedFile);
+
+        setFile(selectedFile);
+        setImage(url);
+
+        setOriginalFile(selectedFile);
     };
 
     // 이미지 프로세싱 처리 요청
     const handleFilter = async (type: string) => {
         if (!file) {
             alert("이미지를 먼저 선택하세요");
+            return;
+        }
+
+        if (type === "Reset") {
+            if (!originalFile) {
+                alert("되돌릴 원본 이미지가 없습니다.");
+                return;
+            }
+
+            const resetUrl = URL.createObjectURL(originalFile);
+
+            setImage(resetUrl);      // 화면에 표시되는 URL
+            setFile(originalFile);   // File은 File 그대로 넣기!
+            setIsCropMode(false);
             return;
         }
 
@@ -65,9 +84,6 @@ export default function ImageEditor() {
 
             const blob = await response.blob(); // 이미지 blob으로 받기
 
-            if(image) {
-                URL.revokeObjectURL(image);
-            }
             const imageURL = URL.createObjectURL(blob);
 
             const processedFile = new File([blob], file.name, {type: blob.type});
