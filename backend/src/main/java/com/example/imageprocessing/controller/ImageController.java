@@ -67,4 +67,25 @@ public class ImageController {
             return ResponseEntity.internalServerError().build();
         }
     }
+
+    @PostMapping("/crop")
+    public ResponseEntity<byte[]> cropImage(
+            @RequestParam("file") MultipartFile file,
+            @RequestParam("x1") int x1,
+            @RequestParam("y1") int y1,
+            @RequestParam("x2") int x2,
+            @RequestParam("y2") int y2
+    ) {
+        try {
+            byte[] result = imageService.processCrop(file, x1, y1, x2, y2);
+
+            return ResponseEntity.ok()
+                    .contentType(ImageService.getMediaType(file.getContentType()))
+                    .body(result);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }
