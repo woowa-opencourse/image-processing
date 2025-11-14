@@ -19,15 +19,18 @@ public class ImageService {
     private final ImageProcessor grayscaleProcessor;
     private final ImageProcessor invertProcessor;
     private final BrightnessProcessor brightnessProcessor;
+    private final ImageCropProcessor cropProcessor;
 
     public ImageService(ImageValidator imageValidator,
                         ImageProcessor grayscaleProcessor,
                         ImageProcessor invertProcessor,
-                        BrightnessProcessor brightnessProcessor) {
+                        BrightnessProcessor brightnessProcessor,
+                        ImageCropProcessor cropProcessor) {
         this.imageValidator = imageValidator;
         this.grayscaleProcessor = grayscaleProcessor;
         this.invertProcessor = invertProcessor;
         this.brightnessProcessor = brightnessProcessor;
+        this.cropProcessor = cropProcessor;
     }
 
     public byte[] processGrayscale(MultipartFile file) throws IOException {
@@ -61,6 +64,16 @@ public class ImageService {
         BufferedImage brightnessImage = brightnessProcessor.process(originalImage, adjustment);
 
         return  convertToByteArray(brightnessImage, getFileExtension(file.getOriginalFilename()));
+    }
+
+    public byte[] processCrop(MultipartFile file, int x1, int y1, int x2, int y2) throws IOException {
+        imageValidator.validate(file);
+
+        BufferedImage originalImage = ImageIO.read(file.getInputStream());
+
+        BufferedImage cropped = cropProcessor.process(originalImage, x1, y1, x2, y2);
+
+        return convertToByteArray(cropped, getFileExtension(file.getOriginalFilename()));
     }
 
     // 💡 Byte Array 변환 헬퍼
