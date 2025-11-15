@@ -77,11 +77,11 @@ public class ImageController {
             @RequestParam("y2") int y2
     ) {
         try {
-            byte[] result = imageService.processCrop(file, x1, y1, x2, y2);
+            byte[] processedImageBytes = imageService.processCrop(file, x1, y1, x2, y2);
 
             return ResponseEntity.ok()
                     .contentType(ImageService.getMediaType(file.getContentType()))
-                    .body(result);
+                    .body(processedImageBytes);
 
         } catch (Exception e) {
             e.printStackTrace();

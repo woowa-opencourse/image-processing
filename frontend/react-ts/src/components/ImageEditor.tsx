@@ -48,8 +48,8 @@ export default function ImageEditor() {
 
             const resetUrl = URL.createObjectURL(originalFile);
 
-            setImage(resetUrl);      // 화면에 표시되는 URL
-            setFile(originalFile);   // File은 File 그대로 넣기!
+            setImage(resetUrl);
+            setFile(originalFile);
             setIsCropMode(false);
             return;
         }
