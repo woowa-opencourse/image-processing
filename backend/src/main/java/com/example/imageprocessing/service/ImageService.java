@@ -19,13 +19,13 @@ public class ImageService {
     private final ImageProcessor grayscaleProcessor;
     private final ImageProcessor invertProcessor;
     private final BrightnessProcessor brightnessProcessor;
-    private final ImageCropProcessor cropProcessor;
+    private final CropProcessor cropProcessor;
 
     public ImageService(ImageValidator imageValidator,
                         ImageProcessor grayscaleProcessor,
                         ImageProcessor invertProcessor,
                         BrightnessProcessor brightnessProcessor,
-                        ImageCropProcessor cropProcessor) {
+                        CropProcessor cropProcessor) {
         this.imageValidator = imageValidator;
         this.grayscaleProcessor = grayscaleProcessor;
         this.invertProcessor = invertProcessor;
@@ -71,9 +71,9 @@ public class ImageService {
 
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
-        BufferedImage cropped = cropProcessor.process(originalImage, x1, y1, x2, y2);
+        BufferedImage cropImage = cropProcessor.process(originalImage, x1, y1, x2, y2);
 
-        return convertToByteArray(cropped, getFileExtension(file.getOriginalFilename()));
+        return convertToByteArray(cropImage, getFileExtension(file.getOriginalFilename()));
     }
 
     // 💡 Byte Array 변환 헬퍼
