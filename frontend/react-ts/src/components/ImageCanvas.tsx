@@ -38,8 +38,11 @@ export default function ImageCanvas({ image, cropMode, onCropComplete }: Props) 
         if (!cropMode) return;
 
         const rect = canvasRef.current!.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const scaleX = canvasRef.current!.width / rect.width;
+        const scaleY = canvasRef.current!.height / rect.height;
+
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
 
         setStartPos({ x, y });
         setCurrentPos({ x, y });
@@ -49,10 +52,12 @@ export default function ImageCanvas({ image, cropMode, onCropComplete }: Props) 
     // 드래그 중
     const handleMouseMove = (e: React.MouseEvent) => {
         if (!isDragging || !cropMode) return;
-
         const rect = canvasRef.current!.getBoundingClientRect();
-        const x = e.clientX - rect.left;
-        const y = e.clientY - rect.top;
+        const scaleX = canvasRef.current!.width / rect.width;
+        const scaleY = canvasRef.current!.height / rect.height;
+
+        const x = (e.clientX - rect.left) * scaleX;
+        const y = (e.clientY - rect.top) * scaleY;
 
         setCurrentPos({ x, y });
         drawCanvasWithSelection(startPos.x, startPos.y, x, y);
