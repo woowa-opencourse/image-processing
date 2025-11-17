@@ -18,7 +18,6 @@ export async function callFilterAPI(
         const response = await fetch(url, {
             method: "POST",
             body: formData,
-            // 프록시 사용 시 mode: cors 제거
         });
 
         if(!response.ok){
