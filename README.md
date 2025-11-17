@@ -44,6 +44,7 @@
 |--------------|------------------|----------------|
 |              | main.tsx         |                |
 |              | App.tsx          |                |
+| `api`        |                  |                |
 | `assets`     | images           |                |
 |              | styles/index.css |                |
 | `components` | ImageEditor.tsx  |                |
