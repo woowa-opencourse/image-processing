@@ -101,6 +101,8 @@ export default function ImageEditor() {
             const newState = !isBrightnessMode;
             setIsBrightnessMode(newState);
             setIsCropMode(false);
+
+            return;
         }
 
         // Crop 모드면 handleCropFilter로 넘김
@@ -117,6 +119,9 @@ export default function ImageEditor() {
             console.warn(`[WARN] 지원하지 않는 형식입니다: ${type}`);
             return;
         }
+
+        const formData = new FormData();
+        formData.append("file", file);
 
         setIsCropMode(false);
         setIsBrightnessMode(false);
