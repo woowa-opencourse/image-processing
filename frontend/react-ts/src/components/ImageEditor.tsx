@@ -171,6 +171,10 @@ export default function ImageEditor() {
 
         const blob = await response.blob();
         const url = URL.createObjectURL(blob);
+
+        const processedFile = new File([blob], file.name, { type: blob.type });
+        setFile(processedFile);
+
         setImage(url);
         setIsCropMode(false);
     };
