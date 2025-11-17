@@ -1,7 +1,7 @@
 import {useState, useCallback} from "react";
 import { callFilterAPI } from '../api/imageApi';
 
-type FilterType = 'GrayScale' | 'Inversion' | 'Brightness' | 'Crop' | 'Reset';
+export type FilterType = 'GrayScale' | 'Inversion' | 'Brightness' | 'Crop' | 'Reset';
 // 'BackgroundRemove', 'TextExtraction' 추가
 
 const FILTER_URLS: { [key: string]: string } = {
@@ -119,6 +119,5 @@ export function useImageEditor() {
         handleFilter,
         handleBrightnessChange,
         handleCropAreaSelected,
-        handleSave: () => { /* 저장 로직 */ } // 저장 로직도 여기에 둘 수 있음
     }
 }
