@@ -12,108 +12,125 @@ export default function ImageCanvas({ image, cropMode, onCropComplete }: Props) 
 
     const [isDragging, setIsDragging] = useState(false);
     const [startPos, setStartPos] = useState({ x: 0, y: 0 });
-    const [currentPos, setCurrentPos] = useState({ x: 0, y: 0 });
 
-    // 이미지 로드 → 캔버스에 그리기
+    const drawImageToCanvas = (img: HTMLImageElement) => {
+        const canvas = canvasRef.current!;
+        const container = canvas.parentElement!;
+        const ctx = canvas.getContext("2d")!;
+
+        const containerW = container.clientWidth;
+        const containerH = container.clientHeight;
+
+        const imgRatio = img.width / img.height;
+        const containerRatio = containerW / containerH;
+
+        if (imgRatio > containerRatio) {
+            canvas.style.width = "100%";
+            canvas.style.height = "auto";
+        } else {
+            canvas.style.width = "auto";
+            canvas.style.height = "100%";
+        }
+
+        canvas.width = img.width;
+        canvas.height = img.height;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+    };
+
+    const drawSelection = (x1: number, y1: number, x2: number, y2: number) => {
+        const canvas = canvasRef.current!;
+        const img = imgRef.current!;
+        const ctx = canvas.getContext("2d")!;
+
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(img, 0, 0);
+
+        ctx.strokeStyle = "red";
+        ctx.lineWidth = 2;
+        ctx.strokeRect(x1, y1, x2 - x1, y2 - y1);
+
+        ctx.fillStyle = "rgba(255, 0, 0, 0.2)";
+        ctx.fillRect(x1, y1, x2 - x1, y2 - y1);
+    };
+
+    const getCanvasCoords = (e: React.MouseEvent) => {
+        const canvas = canvasRef.current!;
+        const rect = canvas.getBoundingClientRect();
+
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+
+        return {
+            x: (e.clientX - rect.left) * scaleX,
+            y: (e.clientY - rect.top) * scaleY
+        };
+    };
+
     useEffect(() => {
         if (!image || !canvasRef.current) return;
 
         const img = new Image();
         img.src = image;
-        imgRef.current = img;
 
         img.onload = () => {
-            const canvas = canvasRef.current!;
-            const ctx = canvas.getContext("2d")!;
-
-            canvas.width = img.width;
-            canvas.height = img.height;
-
-            ctx.drawImage(img, 0, 0);
+            imgRef.current = img;
+            drawImageToCanvas(img);
         };
+
+        img.onerror = () => console.error("이미지 로딩 실패!");
     }, [image]);
 
-    // 드래그 시작
+    useEffect(() => {
+        const resizeHandler = () => {
+            if (imgRef.current) drawImageToCanvas(imgRef.current);
+        };
+        window.addEventListener("resize", resizeHandler);
+        return () => window.removeEventListener("resize", resizeHandler);
+    }, []);
+
     const handleMouseDown = (e: React.MouseEvent) => {
         if (!cropMode) return;
 
-        const rect = canvasRef.current!.getBoundingClientRect();
-        const scaleX = canvasRef.current!.width / rect.width;
-        const scaleY = canvasRef.current!.height / rect.height;
-
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
+        const { x, y } = getCanvasCoords(e);
 
         setStartPos({ x, y });
-        setCurrentPos({ x, y });
         setIsDragging(true);
     };
 
-    // 드래그 중
     const handleMouseMove = (e: React.MouseEvent) => {
         if (!isDragging || !cropMode) return;
-        const rect = canvasRef.current!.getBoundingClientRect();
-        const scaleX = canvasRef.current!.width / rect.width;
-        const scaleY = canvasRef.current!.height / rect.height;
 
-        const x = (e.clientX - rect.left) * scaleX;
-        const y = (e.clientY - rect.top) * scaleY;
+        const { x, y } = getCanvasCoords(e);
 
-        setCurrentPos({ x, y });
-        drawCanvasWithSelection(startPos.x, startPos.y, x, y);
+        drawSelection(startPos.x, startPos.y, x, y);
     };
 
-    // 드래그 종료
-    const handleMouseUp = () => {
+    const handleMouseUp = (e: React.MouseEvent) => {
         if (!isDragging || !cropMode) return;
-
         setIsDragging(false);
 
-        const { x: x1, y: y1 } = startPos;
-        const { x: x2, y: y2 } = currentPos;
+        // ← mouseup 시점의 위치로 확정하는 것이 더 정확함
+        const { x, y } = getCanvasCoords(e);
 
-        const finalCoords = {
-            x1: Math.min(x1, x2),
-            y1: Math.min(y1, y2),
-            x2: Math.max(x1, x2),
-            y2: Math.max(y1, y2),
-        };
+        const x1 = Math.min(startPos.x, x);
+        const y1 = Math.min(startPos.y, y);
+        const x2 = Math.max(startPos.x, x);
+        const y2 = Math.max(startPos.y, y);
 
-        onCropComplete(finalCoords);
-    };
-
-    const drawCanvasWithSelection = (x1: number, y1: number, x2: number, y2: number) => {
-        if (!canvasRef.current || !imgRef.current) return;
-
-        const canvas = canvasRef.current;
-        const ctx = canvas.getContext("2d")!;
-        const img = imgRef.current;
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(img, 0, 0);
-
-        const w = x2 - x1;
-        const h = y2 - y1;
-
-        ctx.strokeStyle = "red";
-        ctx.lineWidth = 2;
-        ctx.strokeRect(x1, y1, w, h);
-
-        ctx.fillStyle = "rgba(255, 0, 0, 0.2)";
-        ctx.fillRect(x1, y1, w, h);
+        onCropComplete({ x1, y1, x2, y2 });
     };
 
     return (
         <div className="border-2 border-black flex justify-center items-center bg-gray-100 w-full max-w-[700px] aspect-[4/3]">
-        {image ? (
+            {image ? (
                 <canvas
                     ref={canvasRef}
                     onMouseDown={handleMouseDown}
                     onMouseMove={handleMouseMove}
                     onMouseUp={handleMouseUp}
                     style={{
-                        maxWidth: "100%",
-                        maxHeight: "100%",
                         cursor: cropMode ? "crosshair" : "default",
                     }}
                 />
