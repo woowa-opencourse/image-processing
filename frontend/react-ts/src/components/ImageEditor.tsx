@@ -66,6 +66,10 @@ export default function ImageEditor() {
         setFile(selectedFile);
         setImage(url);
         setOriginalFile(selectedFile);
+
+        setIsCropMode(false);
+        setIsBrightnessMode(false);
+        setBrightnessAdjustment(0);
     };
 
     // 이미지 프로세싱 처리 요청
@@ -96,13 +100,14 @@ export default function ImageEditor() {
         if(type == "Brightness"){
             const newState = !isBrightnessMode;
             setIsBrightnessMode(newState);
-
-            // crop mode 비활성화도 필요할까?
+            setIsCropMode(false);
         }
 
         // Crop 모드면 handleCropFilter로 넘김
         if (type === "Crop") {
             setIsCropMode(true);
+            setIsBrightnessMode(false);
+            setBrightnessAdjustment(0);
             return;
         }
 
@@ -113,8 +118,9 @@ export default function ImageEditor() {
             return;
         }
 
-        const formData = new FormData();
-        formData.append("file", file);
+        setIsCropMode(false);
+        setIsBrightnessMode(false);
+        setBrightnessAdjustment(0);
 
         // API 호출
         await callFilterAPI(file, url);
