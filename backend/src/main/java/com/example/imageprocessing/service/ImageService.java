@@ -2,7 +2,6 @@ package com.example.imageprocessing.service;
 
 
 import com.example.imageprocessing.domain.ImageValidator;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
