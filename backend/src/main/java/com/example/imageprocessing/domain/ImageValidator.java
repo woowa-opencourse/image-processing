@@ -9,20 +9,17 @@ import java.io.IOException;
 
 @Component
 public class ImageValidator {
-    private String wrapError(String msg) {
-        return "[ERROR] " + msg;
-    }
 
     public void validate(MultipartFile file) throws IOException {
         if (file == null || file.isEmpty()) {
-            throw new IllegalArgumentException(wrapError("파일이 존재하지 않습니다."));
+            throw new IllegalArgumentException("파일이 존재하지 않습니다.");
         }
 
-        // ImageIO.read는 유효하지 않은 포맷일 경우 null을 반환함
         BufferedImage image = ImageIO.read(file.getInputStream());
 
+        // ImageIO.read → 잘못된 이미지면 null 반환
         if (image == null) {
-            throw new IllegalArgumentException(wrapError("지원하지 않는 파일 형식 또는 유효하지 않은 이미지 파일입니다."));
+            throw new IllegalArgumentException("지원하지 않는 파일 형식 또는 유효하지 않은 이미지 파일입니다.");
         }
     }
 }
