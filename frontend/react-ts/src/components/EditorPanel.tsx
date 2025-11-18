@@ -1,14 +1,15 @@
 import { useCallback } from 'react';
+import type {FilterType} from "../hooks/useImageEditor.ts";
 
 interface Props {
-    onFilter: (type: string) => void;
+    onFilter: (type: FilterType) => void;
     cropMode: boolean;
     isBrightnessMode: boolean;
     brightnessAdjustment: number;
     onBrightnessChange: (value: number) => void;
 }
 
-const buttons = ["GrayScale", "Brightness", "Inversion", "Crop", "Reset"];
+const buttons: FilterType[] = ["GrayScale", "Brightness", "Inversion", "Crop", "Reset"];
 
 export default function EditorPanel({
     onFilter,
