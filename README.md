@@ -40,23 +40,33 @@
 
 ## 📝 구현 기능 목록
 ### A. 프로젝트 구조 - frontend
-| **패키지**      | **구성**           | **역할 및 확장 방향** |
-|--------------|------------------|----------------|
-|              | main.tsx         |                |
-|              | App.tsx          |                |
-| `api`        |                  |                |
-| `assets`     | images           |                |
-|              | styles/index.css |                |
-| `components` | ImageEditor.tsx  |                |
-|              | ImageCanvas.tsx  |                |
-|              | EditorPanel.tsx  |                |
-|              | ControlPanel.tsx |                |
-
-### A. 프로젝트 구조 - backend
 | **패키지**      | **구성**            | **역할 및 확장 방향** |
 |--------------|-------------------|----------------|
-| `controller` | `ImageController` | 프로그램의 흐름 제어    |
-| `service`    | `ImageService`    |                |
-| `domain`     |                   |                |
+|              | main.tsx          |                |
+|              | App.tsx           |                |
+| `api`        | imageApi.ts       | 이미지 프로세싱 api   |
+| `assets`     | images            | 로컬 이미지         |
+|              | styles/index.css  | ui             |
+| `components` | ImageEditor.tsx   |                |
+|              | ImageCanvas.tsx   |                |
+|              | EditorPanel.tsx   |                |
+|              | ControlPanel.tsx  |                |
+| `hooks`      | useImageEditor.ts | 커스텀 훅          |
+
+### A. 프로젝트 구조 - backend
+| **패키지**      | **구성**                      | **역할 및 확장 방향** |
+|--------------|-----------------------------|----------------|
+| `controller` | ImageController.java        | 프로그램의 흐름 제어    |
+|              | GlobalExceptionHandler.java |                |
+| `service`    | ImageService.java           |                |
+|              | ImageProcessor.java         |                |
+|              | FilterType.java             |                |
+|              | GrayscaleProcessor.java     |                |
+|              | InvertProcessor.java        |                |
+|              | BrightnessProcessor.java    |                |
+|              | CropProcessor.java          |                |
+| `domain`     | Pixel.java                  |                |
+|              | ImageValidator.java         |                |
+|              | GrayscaleWeights.java       |                |
 
 ## 🚨 예외 처리 (오류 검증)
