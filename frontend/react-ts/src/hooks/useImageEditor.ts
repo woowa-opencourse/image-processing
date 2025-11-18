@@ -87,13 +87,13 @@ export function useImageEditor() {
 
     // brightness 슬라이더 변경 핸들러
     const handleBrightnessChange = useCallback(async (value: number) => {
-        if (!originalFile) return;
+        if (!file) return;
         setBrightnessAdjustment(value);
 
-        await callFilterAPI(originalFile, FILTER_URLS["Brightness"], setFile, setImage, {
+        await callFilterAPI(file, FILTER_URLS["Brightness"], setFile, setImage, {
             "adjustment": String(value)
         });
-    }, [originalFile, setFile, setImage]);
+    }, [file, setFile, setImage]);
 
     // Crop 완료 핸들러
     const handleCropAreaSelected = useCallback(async (coords: { x1: number; y1: number; x2: number; y2: number }) => {
