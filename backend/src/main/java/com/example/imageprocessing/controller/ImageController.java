@@ -49,7 +49,9 @@ public class ImageController {
     @PostMapping("/brightness")
     public ResponseEntity<byte[]> processBrightness(@RequestParam("file") MultipartFile file,
                                                     @RequestParam(value = "filterHistory", required = false) String filterHistoryJson,
-                                                    @RequestParam("adjustment") int adjustment) throws IOException {
+                                                    @RequestParam(value = "brightnessAdjustment", required = false) Integer brightnessAdjustment) throws IOException {
+        int adjustment = (brightnessAdjustment != null) ? brightnessAdjustment : 0;
+
         byte[] processedImageBytes = imageService.processBrightness(file,filterHistoryJson, adjustment);
 
         return ResponseEntity.ok(processedImageBytes);
