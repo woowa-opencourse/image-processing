@@ -1,15 +1,14 @@
 import {useState, useCallback} from "react";
-import { callFilterAPI } from '../api/imageApi';
+import {callFilterAPI, callOcrAPI} from '../api/imageApi';
 
-export type FilterType = 'GrayScale' | 'Inversion' | 'Brightness' | 'Crop' | 'Reset';
-// 'BackgroundRemove', 'TextExtraction' 추가
+export type FilterType = 'GrayScale' | 'Inversion' | 'Brightness' | 'Crop' | 'Reset' | 'OCR';
 
 const FILTER_URLS: { [key: string]: string } = {
     "GrayScale": "/api/image/grayscale",
     "Inversion": "/api/image/invert",
     "Brightness": "/api/image/brightness",
-    "Crop": "/api/image/crop"
-    //'BackgroundRemove', 'TextExtraction' 추가
+    "Crop": "/api/image/crop",
+    "OCR": "/api/image/ocr"
 }
 
 export function useImageEditor() {
@@ -21,7 +20,7 @@ export function useImageEditor() {
     const [isCropMode, setIsCropMode] = useState(false);
     const [filterHistory, setFilterHistory] = useState<FilterType[]>([]);
     const [baseFileForBrightness, setBaseFileForBrightness] = useState<File | null>(null);
-
+    const [ocrResult, setOcrResult] = useState<string | null>(null);
 
     // 모든 상태를 초기화하는 함수
     const resetState = useCallback((resetFile: File | null) => {
@@ -30,6 +29,7 @@ export function useImageEditor() {
         setBrightnessAdjustment(0);
         setFilterHistory([]);
         setBaseFileForBrightness(null);
+        setOcrResult(null);
 
         if(resetFile){
             setFile(resetFile);
@@ -46,6 +46,7 @@ export function useImageEditor() {
         setBrightnessAdjustment(0);
         setIsCropMode(false);
         setIsBrightnessMode(false);
+        setOcrResult(null);
 
         const selectedFile = e.target.files?.[0];
         if(!selectedFile){
@@ -60,6 +61,20 @@ export function useImageEditor() {
     const handleFilter = useCallback(async (type: FilterType) => {
         if(!file){
             alert("이미지를 먼저 선택하세요.");
+            return;
+        }
+
+        if (type === "OCR") {
+            setOcrResult("텍스트 인식 중...");
+            const url = FILTER_URLS[type];
+
+            try {
+                const resultText = await callOcrAPI(file, url);
+                setOcrResult(resultText);
+            } catch (error) {
+                console.error("OCR 처리 중 오류 발생:", error);
+                setOcrResult("OCR 인식 실패: " + (error instanceof Error ? error.message : "알 수 없는 오류"));
+            }
             return;
         }
 
@@ -97,6 +112,7 @@ export function useImageEditor() {
         setIsCropMode(false);
         setIsBrightnessMode(false);
         setBaseFileForBrightness(null);
+        setOcrResult(null);
 
         const newHistory = [...filterHistory, type];
         setFilterHistory(newHistory);
@@ -106,9 +122,13 @@ export function useImageEditor() {
             "adjustment": String(brightnessAdjustment)
         };
 
-
-        // callFilterAPI를 통해 파일 업데이트 및 이미지 url 설정
-        await callFilterAPI(file!, url, setFile, setImage, extraData);
+        try {
+            // callFilterAPI를 통해 파일 업데이트 및 이미지 url 설정
+            await callFilterAPI(file!, url, setFile, setImage, extraData);
+            setFilterHistory(newHistory); // 성공 시에만 히스토리 업데이트
+        } catch (error) {
+            console.error("필터 처리 중 오류 발생:", error);
+        }
     }, [file, originalFile, resetState, setFile, setImage, filterHistory, brightnessAdjustment]);
 
     // brightness 슬라이더 변경 핸들러
@@ -117,6 +137,7 @@ export function useImageEditor() {
             return;
         }
         setBrightnessAdjustment(value);
+        setOcrResult(null);
 
         await callFilterAPI(baseFileForBrightness, FILTER_URLS["Brightness"], setFile, setImage, {
             "filterHistory": JSON.stringify(filterHistory),
@@ -131,6 +152,7 @@ export function useImageEditor() {
         setIsCropMode(false);
         setIsBrightnessMode(false);
         setBaseFileForBrightness(null);
+        setOcrResult(null);
 
         await callFilterAPI(file, FILTER_URLS["Crop"], setFile, setImage, {
             "x1": String(Math.round(coords.x1)),
@@ -146,6 +168,7 @@ export function useImageEditor() {
         isCropMode,
         isBrightnessMode,
         brightnessAdjustment,
+        ocrResult,
         handleOpenPhoto,
         handleFilter,
         handleBrightnessChange,
