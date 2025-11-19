@@ -20,11 +20,14 @@ export function useImageEditor() {
     const [brightnessAdjustment, setBrightnessAdjustment] = useState(0);
     const [isCropMode, setIsCropMode] = useState(false);
 
+    const [filterHistory, setFilterHistory] = useState<FilterType[]>([]);
+
     // 모든 상태를 초기화하는 함수
     const resetState = useCallback((resetFile: File | null) => {
         setIsCropMode(false);
         setIsBrightnessMode(false);
         setBrightnessAdjustment(0);
+        setFilterHistory([]);
 
         if(resetFile){
             setFile(resetFile);
@@ -81,19 +84,32 @@ export function useImageEditor() {
         setIsCropMode(false);
         setIsBrightnessMode(false);
 
+        const newHistory = [...filterHistory, type];
+        setFilterHistory(newHistory);
+
+        const extraData: Record<string, string> = {
+            // 현재 적용된 모든 필터 목록과 밝기 값을 JSON으로 전달
+            "filterHistory": JSON.stringify(newHistory),
+            "adjustment": String(brightnessAdjustment)
+        };
+
+
         // callFilterAPI를 통해 파일 업데이트 및 이미지 url 설정
-        await callFilterAPI(file, url, setFile, setImage);
-    }, [file, originalFile, resetState, setFile, setImage]);
+        await callFilterAPI(originalFile!, url, setFile, setImage, extraData);
+    }, [file, originalFile, resetState, setFile, setImage, filterHistory, brightnessAdjustment]);
 
     // brightness 슬라이더 변경 핸들러
     const handleBrightnessChange = useCallback(async (value: number) => {
-        if (!file) return;
+        if (!originalFile) {
+            return;
+        }
         setBrightnessAdjustment(value);
 
-        await callFilterAPI(file, FILTER_URLS["Brightness"], setFile, setImage, {
+        await callFilterAPI(originalFile, FILTER_URLS["Brightness"], setFile, setImage, {
+            "filterHistory": JSON.stringify(filterHistory),
             "adjustment": String(value)
         });
-    }, [file, setFile, setImage]);
+    }, [originalFile, setFile, setImage, filterHistory]);
 
     // Crop 완료 핸들러
     const handleCropAreaSelected = useCallback(async (coords: { x1: number; y1: number; x2: number; y2: number }) => {

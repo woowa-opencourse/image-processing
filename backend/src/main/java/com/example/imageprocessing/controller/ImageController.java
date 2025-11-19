@@ -22,33 +22,37 @@ public class ImageController {
     }
 
     @PostMapping("/grayscale")
-    public ResponseEntity<byte[]> processGrayscale(@RequestParam("file") MultipartFile file) throws IOException {
+    public ResponseEntity<byte[]> processGrayscale(@RequestParam("file") MultipartFile file,
+                                                   @RequestParam(value = "filterHistory", required = false) String filterHistoryJson,
+                                                   @RequestParam(value = "brightnessAdjustment", required = false) Integer brightnessAdjustment) throws IOException {
+
+        int adjustment = (brightnessAdjustment != null) ? brightnessAdjustment : 0;
+
         // Service layer로 MultipartFile과 흑백 처리 위임
-        byte[] processedImageBytes = imageService.processGrayscale(file);
+        byte[] processedImageBytes = imageService.processGrayscale(file, filterHistoryJson, adjustment);
 
         // 처리된 이미지 바이트 배열을 HTTP 응답으로 변환
-        return ResponseEntity.ok()
-                .contentType(ImageService.getMediaType(file.getContentType()))
-                .body(processedImageBytes);
+        return ResponseEntity.ok(processedImageBytes);
     }
 
     @PostMapping("/invert")
-    public ResponseEntity<byte[]> processInvert(@RequestParam("file") MultipartFile file) throws IOException {
-        byte[] processedImageBytes = imageService.processInvert(file);
+    public ResponseEntity<byte[]> processInvert(@RequestParam("file") MultipartFile file,
+                                                @RequestParam(value = "filterHistory", required = false) String filterHistoryJson,
+                                                @RequestParam(value = "brightnessAdjustment", required = false) Integer brightnessAdjustment) throws IOException {
+        int adjustment = (brightnessAdjustment != null) ? brightnessAdjustment : 0;
 
-        return ResponseEntity.ok()
-                .contentType(ImageService.getMediaType(file.getContentType()))
-                .body(processedImageBytes);
+        byte[] processedImageBytes = imageService.processInvert(file, filterHistoryJson, adjustment);
+
+        return ResponseEntity.ok(processedImageBytes);
     }
 
     @PostMapping("/brightness")
     public ResponseEntity<byte[]> processBrightness(@RequestParam("file") MultipartFile file,
+                                                    @RequestParam(value = "filterHistory", required = false) String filterHistoryJson,
                                                     @RequestParam("adjustment") int adjustment) throws IOException {
-        byte[] processedImageBytes = imageService.processBrightness(file, adjustment);
+        byte[] processedImageBytes = imageService.processBrightness(file,filterHistoryJson, adjustment);
 
-        return ResponseEntity.ok()
-                .contentType(ImageService.getMediaType(file.getContentType()))
-                .body(processedImageBytes);
+        return ResponseEntity.ok(processedImageBytes);
     }
 
     @PostMapping("/crop")
@@ -57,12 +61,14 @@ public class ImageController {
             @RequestParam("x1") int x1,
             @RequestParam("y1") int y1,
             @RequestParam("x2") int x2,
-            @RequestParam("y2") int y2
+            @RequestParam("y2") int y2,
+            @RequestParam(value = "filterHistory", required = false) String filterHistoryJson,
+            @RequestParam(value = "brightnessAdjustment", required = false) Integer brightnessAdjustment
     ) throws IOException {
-        byte[] processedImageBytes = imageService.processCrop(file, x1, y1, x2, y2);
+        int adjustment = (brightnessAdjustment != null) ? brightnessAdjustment : 0;
 
-        return ResponseEntity.ok()
-                .contentType(ImageService.getMediaType(file.getContentType()))
-                .body(processedImageBytes);
+        byte[] processedImageBytes = imageService.processCrop(file, x1, y1, x2, y2, filterHistoryJson, adjustment);
+
+        return ResponseEntity.ok(processedImageBytes);
     }
 }
