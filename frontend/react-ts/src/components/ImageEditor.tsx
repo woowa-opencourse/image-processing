@@ -9,6 +9,7 @@ export default function ImageEditor() {
         isCropMode,
         isBrightnessMode,
         brightnessAdjustment,
+        ocrResult,
         handleOpenPhoto,
         handleFilter,
         handleBrightnessChange,
@@ -32,6 +33,7 @@ export default function ImageEditor() {
                 isBrightnessMode = {isBrightnessMode}
                 brightnessAdjustment = {brightnessAdjustment}
                 onBrightnessChange = {handleBrightnessChange}
+                ocrResult = {ocrResult}
             />
             <div className = "flex flex-col md:flex-row justify-center items-end gap-x-40 gap-y-10 p-8 w-full max-w-[1200px] mx-auto">
                 <ImageCanvas
