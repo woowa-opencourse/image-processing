@@ -37,3 +37,42 @@ export async function callFilterAPI(
         throw error;
     }
 }
+
+export async function callOcrAPI(
+    file: File,
+    endpoint: string,
+): Promise<string> {
+    const formData = new FormData();
+    formData.append('file', file);
+
+    const apiUrl = endpoint;
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            let errorMessage = `[ERROR] 서버 오류: ${response.status}`;
+            try {
+                const errorBody = await response.json();
+                errorMessage += ` - ${errorBody.message || JSON.stringify(errorBody)}`;
+            } catch (e) {
+                errorMessage += ` - ${await response.text()}`;
+            }
+            throw new Error(errorMessage);
+        }
+
+        const result = await response.json();
+
+        if (result && result.text !== undefined) {
+            return result.text;
+        } else {
+            throw new Error("OCR API에서 유효한 텍스트 결과를 받지 못했습니다.");
+        }
+    } catch (error) {
+        console.error(`[ERROR] OCR 처리 실패: `, error);
+        throw error;
+    }
+}
