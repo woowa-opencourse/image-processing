@@ -91,3 +91,13 @@ export async function callOcrAPI(
         throw error;
     }
 }
+
+export async function callPixabayAPI(q: string) {
+    const response = await fetch(`/api/pixabay/search?q=${encodeURIComponent(q)}`);
+
+    if (!response.ok) {
+        throw new Error("[ERROR] Pixabay 검색 실패");
+    }
+
+    return response.json();
+}
