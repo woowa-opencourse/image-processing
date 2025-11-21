@@ -21,6 +21,9 @@ export function useImageEditor() {
     const [filterHistory, setFilterHistory] = useState<FilterType[]>([]);
     const [baseFileForBrightness, setBaseFileForBrightness] = useState<File | null>(null);
     const [ocrResult, setOcrResult] = useState<string | null>(null);
+    const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
+    const openSearchOnline = () => setIsSearchModalOpen(true);
+    const closeSearchOnline = () => setIsSearchModalOpen(false);
 
     // 모든 상태를 초기화하는 함수
     const resetState = useCallback((resetFile: File | null) => {
@@ -56,6 +59,18 @@ export function useImageEditor() {
         setOriginalFile(selectedFile);
         resetState(selectedFile);
     }, [resetState]);
+
+    // Pixabay 이미지 받아서 File로 변환 후 로드하는 기능
+    async function handleOpenFromAPI(url: string) {
+        const blob = await fetch(url).then((r) => r.blob());
+        const file = new File([blob], "pixabay_image.jpg", { type: blob.type });
+
+        setOriginalFile(file);
+        setFile(file);
+
+        const imageUrl = URL.createObjectURL(file);
+        setImage(imageUrl);
+    }
 
     // 이미지 처리 요청
     const handleFilter = useCallback(async (type: FilterType) => {
@@ -173,5 +188,9 @@ export function useImageEditor() {
         handleFilter,
         handleBrightnessChange,
         handleCropAreaSelected,
+        isSearchModalOpen,
+        openSearchOnline,
+        closeSearchOnline,
+        handleOpenFromAPI,
     }
 }
