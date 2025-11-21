@@ -1,6 +1,7 @@
 import ControlPanel from './ControlPanel'
 import EditorPanel from './EditorPanel'
 import ImageCanvas from './ImageCanvas'
+import ImageFinder from "./ImageFinder.tsx"
 import { useImageEditor } from '../hooks/useImageEditor';
 
 export default function ImageEditor() {
@@ -14,6 +15,10 @@ export default function ImageEditor() {
         handleFilter,
         handleBrightnessChange,
         handleCropAreaSelected,
+        openSearchOnline,
+        isSearchModalOpen,
+        closeSearchOnline,
+        handleOpenFromAPI
     } = useImageEditor();
 
     // 이미지 파일 저장 로직
@@ -43,8 +48,17 @@ export default function ImageEditor() {
                 />
                 <ControlPanel
                     onOpenPhoto = {handleOpenPhoto}
-                    onSave = {handleSavePhoto} />
+                    onOpenSearch={openSearchOnline}
+                    onSave = {handleSavePhoto}
+                />
             </div>
+            {isSearchModalOpen && (
+                <ImageFinder
+                    isOpen={isSearchModalOpen}
+                    onClose={closeSearchOnline}
+                    onSelectImage={handleOpenFromAPI}
+                />
+            )}
         </div>
     )
 }
