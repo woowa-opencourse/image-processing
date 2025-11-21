@@ -1,5 +1,21 @@
 import * as React from "react";
 
+function getApiBase(): string {
+    return import.meta.env.VITE_API_URL || "";
+}
+
+function buildFullUrl(path: string): string {
+    const base = getApiBase();
+
+    // base URL이 없거나 이미 절대 URL이면 그대로 사용
+    if (!base || /^https?:\/\//i.test(path)) return path;
+
+    const trimmedBase = base.replace(/\/+$/, "");
+    const normalizedPath = path.startsWith("/") ? path : "/" + path;
+
+    return trimmedBase + normalizedPath;
+}
+
 export async function callFilterAPI(
     currentFile: File,
     url: string,
@@ -15,7 +31,7 @@ export async function callFilterAPI(
     });
 
     try{
-        const response = await fetch(url, {
+        const response = await fetch(buildFullUrl(url), {
             method: "POST",
             body: formData,
         });
@@ -42,13 +58,12 @@ export async function callOcrAPI(
     file: File,
     endpoint: string,
 ): Promise<string> {
+
     const formData = new FormData();
     formData.append('file', file);
 
-    const apiUrl = endpoint;
-
     try {
-        const response = await fetch(apiUrl, {
+        const response = await fetch(buildFullUrl(endpoint), {
             method: 'POST',
             body: formData,
         });
