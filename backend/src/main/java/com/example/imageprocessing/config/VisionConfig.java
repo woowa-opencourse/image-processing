@@ -7,6 +7,10 @@ import com.google.cloud.vision.v1.ImageAnnotatorSettings;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.List;
@@ -16,16 +20,16 @@ public class VisionConfig {
 
     @Bean
     public ImageAnnotatorClient imageAnnotatorClient() throws IOException {
-        String credentialsPath = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
 
-        if (credentialsPath == null) {
+        String jsonCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
+
+        if (jsonCredentials == null || jsonCredentials.isBlank()) {
             throw new IllegalStateException(
-                    "환경 변수 GOOGLE_APPLICATION_CREDENTIALS 가 설정되지 않았습니다!"
-            );
+                    "환경 변수 GOOGLE_CREDENTIALS_JSON 이 설정되지 않았습니다!"
         }
 
         GoogleCredentials credentials = GoogleCredentials
-                .fromStream(new FileInputStream(credentialsPath))
+                .fromStream(new ByteArrayInputStream(jsonCredentials.getBytes(StandardCharsets.UTF_8)))
                 .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
 
         ImageAnnotatorSettings settings = ImageAnnotatorSettings.newBuilder()
