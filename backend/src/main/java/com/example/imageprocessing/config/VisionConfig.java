@@ -19,7 +19,7 @@ public class VisionConfig {
     public ImageAnnotatorClient imageAnnotatorClient() throws IOException {
         String jsonCredentials = System.getenv("GOOGLE_APPLICATION_CREDENTIALS");
 
-        if (jsonCredentials == null || jsonCredentials.isBlank()) {
+        if (jsonCredentials == null) {
             throw new IllegalStateException(
                     "환경 변수 GOOGLE_CREDENTIALS_JSON 이 설정되지 않았습니다!"
             );
