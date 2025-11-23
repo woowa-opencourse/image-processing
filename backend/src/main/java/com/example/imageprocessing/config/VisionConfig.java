@@ -26,6 +26,7 @@ public class VisionConfig {
         if (jsonCredentials == null) {
             throw new IllegalStateException(
                     "환경 변수 GOOGLE_CREDENTIALS_JSON 이 설정되지 않았습니다!"
+            );
         }
 
         GoogleCredentials credentials = GoogleCredentials
