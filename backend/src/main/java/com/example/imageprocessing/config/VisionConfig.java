@@ -8,9 +8,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import java.io.ByteArrayInputStream;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
 
@@ -27,11 +25,8 @@ public class VisionConfig {
             );
         }
 
-        InputStream credentialsStream =
-                new ByteArrayInputStream(jsonCredentials.getBytes(StandardCharsets.UTF_8));
-
         GoogleCredentials credentials = GoogleCredentials
-                .fromStream(credentialsStream)
+                .fromStream(new ByteArrayInputStream(jsonCredentials.getBytes(StandardCharsets.UTF_8)))
                 .createScoped(List.of("https://www.googleapis.com/auth/cloud-platform"));
 
         ImageAnnotatorSettings settings = ImageAnnotatorSettings.newBuilder()
