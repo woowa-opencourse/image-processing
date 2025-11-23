@@ -4,6 +4,7 @@
 
 배포 URL: https://image-processing-puce.vercel.app/
 
+노션 URL: https://m.site.naver.com/1WbDL
 
 <img src="https://github.com/woowa-opencourse/image-processing/blob/Heera/resources/img.png?raw=true" width="600" height="400" />
 
@@ -30,17 +31,16 @@
 ### 추가 기능
 1. Image Processing 내
 
-    - 콜라주
-    - 객체 추출
-    - 글자 추출
-    - 이미지 합성
+    - [x] 글자 추출 
+    - [ ] 객체 추출
+    - [ ] 이미지 합성
 
 
 2. Image Processing 외
 
-    - 로그인 기능
-    - DB 기능(기존의 이미지 저장 기능과 연결)
-    - 이미지에 그림 그리기
+    - [x] 온라인 이미지 검색 기능
+    - [ ] 로그인 기능
+    - [ ] 이미지에 그림 그리기
 
 ## 📝 구현 기능 목록
 ### A. 프로젝트 구조 - frontend
