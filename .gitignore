@@ -40,4 +40,4 @@ out/
 ### VS Code ###
 .vscode/
 *.json
-!vercel.json
+!frontend/react-ts/vercel.json
