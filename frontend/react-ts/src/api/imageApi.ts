@@ -93,7 +93,9 @@ export async function callOcrAPI(
 }
 
 export async function callPixabayAPI(q: string) {
-    const response = await fetch(`/api/pixabay/search?q=${encodeURIComponent(q)}`);
+    const response = await fetch(
+        buildFullUrl(`/api/pixabay/search?q=${encodeURIComponent(q)}`)
+    );
 
     if (!response.ok) {
         throw new Error("[ERROR] Pixabay 검색 실패");
