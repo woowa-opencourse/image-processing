@@ -4,6 +4,9 @@
 
 배포 URL: https://image-processing-puce.vercel.app/
 
+
+<img src="https://github.com/woowa-opencourse/image-processing/blob/Heera/resources/img.png?raw=true" width="600" height="400" />
+
 ## 📖 목차
 * [주요 기능](#-주요-기능)
 * [구현 기능 목록](#-구현-기능-목록)
