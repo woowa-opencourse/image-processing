@@ -40,4 +40,4 @@ out/
 ### VS Code ###
 .vscode/
 *.json
-vision-key.json
+!vercel.json
