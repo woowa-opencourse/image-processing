@@ -58,18 +58,19 @@
 ### A. 프로젝트 구조 - backend
 | **패키지**      | **구성**                      | **역할 및 확장 방향**          |
 |--------------|-----------------------------|-------------------------|
-| `conig`      | VisionConfig.java        | Google Vision API 인증 설정 |
-| `controller` | GlobalExceptionHandler.java        | 전역 예외 처리                |
-|              | ImageController.java | 이미지 필터 처리 요청 관리         |
-|              | OcrController.java | 이미지에서 텍스트 (OCR) 추출 처리   |
-|              | PixabayController.java | Pixabay 이미지 검색 API 호출   |
-| `domain`     | GrayscaleWeights.java        | 흑백 변환 가중치 제공            |
-|              | ImageValidator.java | 업로드 이미지 유효성 검사          |
-|              | Pixel.java | 이미지 픽셀 RGB 연산 담당        |
-| `service`    | BrightnessProcessor.java           | 이미지 밝기 조절 처리 로직         |
-|              | CropProcessor.java         | 지정 영역 이미지 크롭 처리 로직      |
+| `config`     | VisionConfig.java           | Google Vision API 인증 설정 |
+|              | CorsConfig.java             | FE 배포 URL 인증 설정         |
+| `controller` | GlobalExceptionHandler.java | 전역 예외 처리                |
+|              | ImageController.java        | 이미지 필터 처리 요청 관리         |
+|              | OcrController.java          | 이미지에서 텍스트 (OCR) 추출 처리   |
+|              | PixabayController.java      | Pixabay 이미지 검색 API 호출   |
+| `domain`     | GrayscaleWeights.java       | 흑백 변환 가중치 제공            |
+|              | ImageValidator.java         | 업로드 이미지 유효성 검사          |
+|              | Pixel.java                  | 이미지 픽셀 RGB 연산 담당        |
+| `service`    | BrightnessProcessor.java    | 이미지 밝기 조절 처리 로직         |
+|              | CropProcessor.java          | 지정 영역 이미지 크롭 처리 로직      |
 |              | FilterType.java             | 필터 종류 정의                |
-|              | GrayscaleProcessor.java| 이미지 흑백 변환 처리 로직         |
+|              | GrayscaleProcessor.java     | 이미지 흑백 변환 처리 로직         |
 |              | ImageProcessor.java         | 필터 처리 공통 인터페이스          |
-|              | ImageService.java         | 이미지 편집 작업 통합 처리 서비스 로직  |
-|              | InvertProcessor.java         | 이미지 색상 반전 처리 로직         |
+|              | ImageService.java           | 이미지 편집 작업 통합 처리 서비스 로직  |
+|              | InvertProcessor.java        | 이미지 색상 반전 처리 로직         |
