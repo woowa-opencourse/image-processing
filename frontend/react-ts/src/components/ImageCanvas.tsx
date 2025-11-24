@@ -111,7 +111,6 @@ export default function ImageCanvas({ image, cropMode, onCropComplete }: Props) 
         if (!isDragging || !cropMode) return;
         setIsDragging(false);
 
-        // ← mouseup 시점의 위치로 확정하는 것이 더 정확함
         const { x, y } = getCanvasCoords(e);
 
         const x1 = Math.min(startPos.x, x);

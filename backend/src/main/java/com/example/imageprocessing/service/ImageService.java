@@ -40,10 +40,8 @@ public class ImageService {
     public byte[] processGrayscale(MultipartFile file, String filterHistoryJson, int brightnessAdjustment) throws IOException {
         imageValidator.validate(file);
 
-        // multipartfile을 buffredimage로 변환
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
 
-        // 흑백 처리 로직 실행(Processor에 위임)
         BufferedImage finalImage = applyAllFilters(
                 originalImage,
                 FilterType.GrayScale,
@@ -51,7 +49,6 @@ public class ImageService {
                 brightnessAdjustment
         );
 
-        // buffredimage를 byte array로 변환해 반환
         return convertToByteArray(finalImage, getFileExtension(file.getOriginalFilename()));
     }
 
@@ -88,31 +85,30 @@ public class ImageService {
     public byte[] processCrop(MultipartFile file, int x1, int y1, int x2, int y2, String filterHistoryJson, int brightnessAdjustment) throws IOException {
         imageValidator.validate(file);
 
-        // 크롭은 히스토리와 밝기 조절의 영향을 받지 않는다고 가정하고 기존 로직 유지
-        // 만약 크롭 후에도 밝기/필터가 적용되길 원한다면, 크롭 결과물을 다시 원본처럼 처리해야 함
         BufferedImage originalImage = ImageIO.read(file.getInputStream());
+
         BufferedImage cropImage = cropProcessor.process(originalImage, x1, y1, x2, y2);
 
         return convertToByteArray(cropImage, getFileExtension(file.getOriginalFilename()));
     }
 
-    // 💡 Byte Array 변환 헬퍼
+    // Byte Array 변환 헬퍼
     private byte[] convertToByteArray(BufferedImage image, String formatName) throws IOException {
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
         ImageIO.write(image, formatName, baos);
         return baos.toByteArray();
     }
 
-    // 💡 파일 확장자 추출 헬퍼
+    // 파일 확장자 추출 헬퍼
     private String getFileExtension(String filename) {
         int dotIndex = filename.lastIndexOf('.');
         if (dotIndex > 0 && dotIndex < filename.length() - 1) {
             return filename.substring(dotIndex + 1);
         }
-        return "png"; // default
+        return "png";
     }
 
-    // 💡 ContentType 설정 헬퍼 (Controller에서 사용)
+    // ContentType 설정 헬퍼 (Controller에서 사용)
     public static MediaType getMediaType(String contentType) {
         // e.g., "image/jpeg" -> MediaType.IMAGE_JPEG
         if (contentType == null) {
@@ -131,7 +127,6 @@ public class ImageService {
 
         List<FilterType> history = parseFilterHistory(filterHistoryJson);
 
-        //crop은 로직이 복잡해서 일단 grayscale & inversion만 처리
         if(currentFilterType != FilterType.Brightness && currentFilterType != FilterType.Crop) {
             history.add(currentFilterType);
         }
@@ -144,7 +139,7 @@ public class ImageService {
                 case Inversion:
                     currentImage = invertProcessor.process(currentImage);
                     break;
-                // Crop: 여기에서 크롭을 처리하려면, 크롭 좌표도 history에 저장돼야 함.
+
                 default:
                     break;
             }
@@ -161,7 +156,7 @@ public class ImageService {
         if (json == null || json.isEmpty() || json.equals("[]")) {
             return new ArrayList<>();
         }
-        // String -> List<FilterType>으로 변환
+
         return objectMapper.readValue(json, new TypeReference<List<FilterType>>() {});
     }
 }

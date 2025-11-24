@@ -7,7 +7,6 @@ function getApiBase(): string {
 function buildFullUrl(path: string): string {
     const base = getApiBase();
 
-    // base URL이 없거나 이미 절대 URL이면 그대로 사용
     if (!base || /^https?:\/\//i.test(path)) return path;
 
     const trimmedBase = base.replace(/\/+$/, "");

@@ -17,7 +17,6 @@ public class ImageValidator {
 
         BufferedImage image = ImageIO.read(file.getInputStream());
 
-        // ImageIO.read → 잘못된 이미지면 null 반환
         if (image == null) {
             throw new IllegalArgumentException("지원하지 않는 파일 형식 또는 유효하지 않은 이미지 파일입니다.");
         }

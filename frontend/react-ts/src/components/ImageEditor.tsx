@@ -21,7 +21,6 @@ export default function ImageEditor() {
         handleOpenFromAPI
     } = useImageEditor();
 
-    // 이미지 파일 저장 로직
     function handleSavePhoto() {
         if (!image) return;
         const link = document.createElement("a");
