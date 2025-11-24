@@ -10,14 +10,14 @@ public class Pixel {
     private final int max = 255;
     private final int min = 0;
 
-    // AWT Color 객체를 받아서 domain 객체로 변환하는 팩토리 메소드
+    // AWT Color 객체를 받아서 domain 객체로 변환
     public Pixel(int red, int green, int blue) {
         this.red = red;
         this.green = green;
         this.blue = blue;
     }
 
-    // AWT Color로 변환하는 메소드
+    // AWT Color로 변환
     public Color toAwtColor() {
         return new Color(red, green, blue);
     }

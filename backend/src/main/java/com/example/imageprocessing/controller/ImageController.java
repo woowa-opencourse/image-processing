@@ -28,7 +28,7 @@ public class ImageController {
 
         int adjustment = (brightnessAdjustment != null) ? brightnessAdjustment : 0;
 
-        // Service layer로 MultipartFile과 흑백 처리 위임
+        // Service layer로 MultipartFile과 필터 처리 위임
         byte[] processedImageBytes = imageService.processGrayscale(file, filterHistoryJson, adjustment);
 
         // 처리된 이미지 바이트 배열을 HTTP 응답으로 변환

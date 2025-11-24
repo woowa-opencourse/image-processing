@@ -22,7 +22,6 @@ public class PixabayController {
             RestTemplate rt = new RestTemplate();
             Map<String, Object> response = rt.getForObject(url, Map.class);
 
-            // "hits" 배열만 반환 (프론트는 배열만 받도록)
             return ResponseEntity.ok(response.get("hits"));
 
         } catch (Exception e) {
